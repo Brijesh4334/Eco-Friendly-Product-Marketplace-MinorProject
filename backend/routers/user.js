@@ -29,4 +29,14 @@ router.get("/getall", (req, res) => {
       res.status(500).json(err);
     });
 });
+router.post('/authenticate', (req, res) => {
+  Model.findOne(req.body)
+  .then((result) => {
+      if (result) res.json(result)
+      else res.status(400).json({meassage: 'login failed'})
+  }).catch((err) => {
+      console.log(err)
+      res.status(500).json(err)
+  });
+})
 module.exports = router;

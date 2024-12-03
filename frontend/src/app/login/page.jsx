@@ -4,6 +4,9 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import toast from 'react-hot-toast';
 import * as Yup from 'yup';
+import useAppContext from '@/context/appContext'
+import axios from 'axios'
+
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
@@ -14,29 +17,32 @@ const LoginSchema = Yup.object().shape({
 });
 
 const login = () => {
-  const [users, setUsers] = useState(JSON.parse(localStorage.getItem('users')) || []);
+
+  const {setLoggedIn, setCurrentUser} = useAppContext();
   const router = useRouter();
 
   const loginForm = useFormik({
     initialValues: {
-      email: '',
-      password: ''
+      email:'',
+      password:'',
     },
-    onSubmit: (values, { resetForm }) => {
-      console.log(users);
+    onSubmit: (values, {resetForm}) => {
+      console.log(values)
+      
+      axios.post('http://localhost:5000/user/authenticate', values)
+      .then((response) => {
+        console.log(response.status)
+        localStorage.setItem('user', JSON.stringify(response.data))
+        setLoggedIn(true)
+        resetForm()
+        toast.success('Login successfully')
+        router.push('/')
 
-      const matchedUser = users.find(user => {
-        user.email === values.email && user.password === values.password
-      })
+      }).catch((err) => {
+        console.log(err)
+        toast.error('Invalid Credentials')
+      });
 
-      if (matchedUser !== null) {
-        localStorage.setItem('authenticated', JSON.stringify(values));
-        toast.success('Loggedin Successfully');
-        window.location = '/search'
-        resetForm();
-      } else {
-        toast.error('Login Failed');
-      }
     },
     validationSchema: LoginSchema
   })

@@ -1,8 +1,13 @@
 'use client'
 import Link from 'next/link'
 import React, { useState } from 'react'
+import useAppContext from '@/context/appContext'
+
 
 export const Navbar = () => {
+
+  const { loggedIn, logout } = useAppContext();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('authenticated')))
 
@@ -61,13 +66,10 @@ export const Navbar = () => {
             </ul>
           </div>
           {
-            currentUser !== null ? (
+            loggedIn ? (
               <button 
               className='text-white'
-              onClick={() => {
-                localStorage.removeItem('authenticated');
-                window.location = '/login';
-              }}>Logout</button>
+              onClick={logout}>Logout</button>
             ) : (
               <ul class="flex items-center hidden space-x-8 lg:flex">
                 <li>

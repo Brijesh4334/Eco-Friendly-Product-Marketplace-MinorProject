@@ -3,6 +3,8 @@ import { useFormik } from 'formik'
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import * as Yup from 'yup';
+import axios from 'axios'
+import toast from 'react-hot-toast'
 
 const SignupSchema = Yup.object().shape({
     name: Yup.string().required('Name is required')
@@ -27,21 +29,28 @@ const Signup = () => {
 
     const signupForm = useFormik({
         initialValues: {
-            name: '',
-            email: '',
-            password: '',
-            confirmPassword: ''
+          name:'',
+          email:'',
+          password:'',
         },
-        onSubmit: (values, { resetForm }) => {
-            console.log(values);
-            const newValues = [...users, values];
-            localStorage.setItem('users', JSON.stringify(newValues));
-            router.push('/login');
-            
-            resetForm();
+        onSubmit: (values, {resetForm}) => {
+          console.log(values)
+          
+          axios.post('http://localhost:5000/user/add', values)
+          .then((response) => {
+            console.log(response.status)
+            resetForm()
+            toast.success('User added successfully')
+            router.push('/login')
+    
+          }).catch((err) => {
+            console.log(err)
+            toast.error('Failed to add user')
+          });
+    
         },
         validationSchema: SignupSchema
-    })
+      })
 
     return (
         <div className='bg-cover h-screen' style={{ backgroundImage: `url('https://d1csarkz8obe9u.cloudfront.net/posterpreviews/powerpoint-eco-green-background-design-template-5a7a4ed1af23c4cf95702c073101be1d_screen.jpg?ts=1697142653')` }}>

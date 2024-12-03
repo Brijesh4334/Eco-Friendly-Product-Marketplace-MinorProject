@@ -1,15 +1,31 @@
 'use client';
-import data from "@/productData";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Search = () => {
 
-    const [productData, setProductData] = useState(data);
+    const [productData, setProductData] = useState([]);
+
+    const fetchProduct = async () => {
+        const res = await fetch("http://localhost:5000/product/getall");
+
+        console.log(res.status);
+
+        const data = await res.json();
+        console.log(data);
+        if (res.status === 200) {
+            // const data = await res.json();
+            console.log(data);
+            setProductData(data)
+        }
+    };
+    useEffect(() => {
+        fetchProduct();
+    }, []);
 
     const searchProduct = (e) => {
         const value = e.target.value;
-        setProductData(data.filter(product => product.title.toLowerCase().includes(value.toLowerCase())))
+        setProductData(productData.filter(productData => productData.title.toLowerCase().includes(value.toLowerCase())))
     }
 
     const displayProducts = () => {
@@ -40,7 +56,7 @@ const Search = () => {
                         </div>
                     </div>
                     <Link
-                        href={"/viewproduct/" + product.id}
+                        href={"/viewproduct/" + product._id}
                         className="inline-flex items-center justify-center w-full h-12 px-6 font-medium tracking-wide text-white transition duration-200 rounded shadow-md bg-purple-400 hover:bg-deep-purple-accent-700 focus:shadow-outline focus:outline-none"
                     >
                         View Details

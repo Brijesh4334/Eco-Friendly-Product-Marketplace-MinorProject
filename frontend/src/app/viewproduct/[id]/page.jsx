@@ -2,7 +2,7 @@
 import data from "@/productData";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Viewproduct = () => {
 
@@ -10,12 +10,25 @@ const Viewproduct = () => {
 
   const [boughtProducts, setBoughtProducts] = useState(JSON.parse(localStorage.getItem('orders')) || []);
 
-  const [productData, setProductData] = useState(data.find(item => item.id == id));
+  const [productList, setProductList] = useState([]);
 
   const router = useRouter();
 
+  const getProductData = async () => {
+    const res = await fetch("http://localhost:5000/product/getbyid/" + id);
+    console.log(res.status);
+
+    const data = await res.json();
+    setProductList(data);
+    console.log(data);
+  }
+
+  useEffect(() => {
+    getProductData();
+  }, [])
+
   const buyProduct = () => {
-    const newData = [...boughtProducts, {...productData, orderedOn: new Date()}];
+    const newData = [...boughtProducts, {...productList, orderedOn: new Date()}];
     localStorage.setItem('orders', JSON.stringify(newData));
     setBoughtProducts(newData);
     router.push('/orders');
@@ -27,14 +40,14 @@ const Viewproduct = () => {
         <div className="mb-16 lg:mb-0 lg:max-w-lg lg:pr-5">
           <div className="max-w-xl mb-6">
             <div>
-              <p className="inline-block px-3 py-px mb-4 text-xs font-semibold tracking-wider uppercase bg-teal-accent-400 text-teal-900 rounded-full">{productData.brand}</p>
+              <p className="inline-block px-3 py-px mb-4 text-xs font-semibold tracking-wider uppercase bg-teal-accent-400 text-teal-900 rounded-full">{productList.brand}</p>
             </div>
             <h2 className="font-sans text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl sm:leading-none max-w-lg mb-6">
-              {productData.title}
+              {productList.title}
 
             </h2>
-            <p className="text-gray-700 text-base md:text-lg">{productData.category}</p>
-            <p className="text-3xl">₹{productData.price}</p>
+            <p className="text-gray-700 text-base md:text-lg">{productList.category}</p>
+            <p className="text-3xl">₹{productList.price}</p>
 
             <button onClick={buyProduct} className="bg-blue-500 py-2 px-4 text-white rounded mt-4">Buy Now</button>
           </div>
@@ -42,7 +55,7 @@ const Viewproduct = () => {
         </div>
         <div className="flex items-center justify-center lg:w-1/2">
           <div className="w-full">
-            <img className="object-cover" src={productData.image} alt="" />
+            <img className="object-cover" src={productList.image} alt="" />
           </div>
 
         </div>

@@ -5,6 +5,7 @@ const cors = require('cors')
 
 const UserRouter = require('./routers/user');
 const ContactRouter = require('./routers/contact')
+const ProductRouter = require('./routers/product')
 
 
 // middleware
@@ -14,6 +15,7 @@ app.use(cors({
 }))
 
 app.use('/user', UserRouter);
+app.use('/product', ProductRouter);
 
 app.use('/contact', ContactRouter)
 
